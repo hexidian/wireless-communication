@@ -2,6 +2,7 @@
 #define data_pin 8
 
 #define error_pin 4
+#define ready_confirmation_pin 3
 
 byte message;
 
@@ -11,6 +12,9 @@ void setup() {
 
   pinMode(clock_pin, INPUT);
   pinMode(data_pin, INPUT);
+
+  pinMode(error_pin, OUTPUT);
+  pinMode(ready_confirmation_pin, INPUT);
 
   message = 0;
   bits = 0;
@@ -31,8 +35,8 @@ void loop() {
       bool this_bit = 1 ? digitalRead(data_pin) : 0;
       Serial.print("this bit is ");
       Serial.println(this_bit);
-      message *= 2;
-      message += this_bit;
+      message = message >> 1;
+      message += this_bit * 0b10000000;
       bits++;
 
       while (digitalRead(clock_pin)) {
@@ -49,6 +53,7 @@ void loop() {
       message = 0;
       transmitSuccess();
     } else {
+      message = 0;
       Serial.println("Error detected");
       transmitError();
     }
@@ -65,24 +70,50 @@ bool checkMessage(byte message) {
 }
 
 void transmitSuccess() {
-  while (!digitalRead(clock_pin)) {
-    delay(10);//wait for clock pulse
+  while (!digitalRead(ready_confirmation_pin)) {
+    delay(2);//wait for pulse
   }
-  digitalWrite(error_pin, HIGH);
-  while (digitalRead(clock_pin)) {
-    delay(10);//wait for clock pulse to end
+  digitalWrite(error_pin, HIGH);//the tell other one we are ready
+  while (digitalRead(ready_confirmation_pin)) {
+    delay(2);//wait for clock pulse to end
   }
+
+  digitalWrite(error_pin, LOW);
+
+  while (!digitalRead(ready_confirmation_pin)) {
+    delay(2);//wait for clock pulse to come back
+  }
+
+  digitalWrite(ready_confirmation_pin, HIGH);
+
+  while (digitalRead(ready_confirmation_pin)) {
+    delay(2);//wait for clock pulse to end
+  }
+
+  digitalWrite(ready_confirmation_pin, LOW);
+
+
   return;
 }
 
 void transmitError() {
-  first_bit = 1;//because other arduino will be reseting
+  while (!digitalRead(ready_confirmation_pin)) {
+    delay(2);//wait for pulse
+  }
+  digitalWrite(error_pin, HIGH);//the tell other one we are ready
+  while (digitalRead(ready_confirmation_pin)) {
+    delay(2);//wait for clock pulse to end
+  }
 
-  while (!digitalRead(clock_pin)) {
-    delay(10);//wait for clock pulse
+  digitalWrite(error_pin, LOW);
+
+  while (!digitalRead(ready_confirmation_pin)) {
+    delay(2);//wait for clock pulse to come back
   }
-  while (digitalRead(clock_pin)) {
-    delay(10);//wait for clock pulse to end
+
+  while (digitalRead(ready_confirmation_pin)) {
+    delay(2);//wait for clock pulse to end
   }
+
   return;
 }
