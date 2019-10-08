@@ -62,7 +62,6 @@ void loop() {
 }
 
 bool checkMessage(byte message) {
-  Serial.println(message);
   if (message == 100) {
     return 1;
   }
@@ -74,6 +73,7 @@ void transmitSuccess() {
     delay(2);//wait for pulse
   }
   digitalWrite(error_pin, HIGH);//the tell other one we are ready
+  Serial.println("first pulse");
   while (digitalRead(ready_confirmation_pin)) {
     delay(2);//wait for clock pulse to end
   }
@@ -84,7 +84,8 @@ void transmitSuccess() {
     delay(2);//wait for clock pulse to come back
   }
 
-  digitalWrite(ready_confirmation_pin, HIGH);
+  digitalWrite(error_pin, HIGH);
+  Serial.println("second pulse");
 
   while (digitalRead(ready_confirmation_pin)) {
     delay(2);//wait for clock pulse to end
