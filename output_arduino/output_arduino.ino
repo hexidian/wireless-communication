@@ -58,20 +58,26 @@ void checkCorrectSent() {
     
   }
 
+  Serial.println("first pulse received");
+
   delay(tickLength / 2);
   digitalWrite(authorizeConfirmationPin, LOW);
   delay(tickLength / 2);
   digitalWrite(authorizeConfirmationPin, HIGH);
-  delay(tickLength / 2);
+  delay(tickLength);
 
   //now we check if there will be a second signal
+  Serial.print("receiving: "); Serial.println(digitalRead(recievePin));
+  delay(20);//to fix serial error
   if (digitalRead(recievePin)) {
+    Serial.println("second pulse received");
     digitalWrite(authorizeConfirmationPin, LOW);
     Serial.println("Correct Message Confirmed");
     return;
   } else {
-    Serial.println("Incorrect Message Sent");
+    //Serial.println("Incorrect Message Sent");
     digitalWrite(authorizeConfirmationPin, LOW);
+    delay(20);//make sure it happens
     resetFunc();
   }
 }
