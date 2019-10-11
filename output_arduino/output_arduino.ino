@@ -1,6 +1,6 @@
 #define dataPin 11
 #define clockPin 12
-#define tickLength 400
+#define tickLength 50
 
 #define recievePin 8
 #define authorizeConfirmationPin 7
@@ -25,8 +25,8 @@ void loop() {
     digitalWrite(clockPin, LOW);
     delay(tickLength / 2);
     digitalWrite(dataPin, message % 2);
-    Serial.print("sending ");
-    Serial.println(message % 2);
+    //Serial.print("sending ");
+    //Serial.println(message % 2);
     delay(tickLength / 2);
     digitalWrite(clockPin, HIGH);
     delay(tickLength / 2);
@@ -36,7 +36,7 @@ void loop() {
 
   checkCorrectSent();
 
-  Serial.println("Done cycle");
+  Serial.println("Done cycle\n");
 
 }
 
@@ -60,14 +60,13 @@ void checkCorrectSent() {
 
   Serial.println("first pulse received");
 
-  delay(tickLength / 2);
+  delay(tickLength);
   digitalWrite(authorizeConfirmationPin, LOW);
-  delay(tickLength / 2);
+  delay(tickLength);
   digitalWrite(authorizeConfirmationPin, HIGH);
   delay(tickLength);
 
   //now we check if there will be a second signal
-  Serial.print("receiving: "); Serial.println(digitalRead(recievePin));
   delay(20);//to fix serial error
   if (digitalRead(recievePin)) {
     Serial.println("second pulse received");
