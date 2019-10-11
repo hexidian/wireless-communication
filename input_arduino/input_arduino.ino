@@ -33,8 +33,8 @@ void loop() {
       }
     } else {
       bool this_bit = 1 ? digitalRead(data_pin) : 0;
-      Serial.print("this bit is ");
-      Serial.println(this_bit);
+      //Serial.print("this bit is ");
+      //Serial.println(this_bit);
       message = message >> 1;
       message += this_bit * 0b10000000;
       bits++;
